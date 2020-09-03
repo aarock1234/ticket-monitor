@@ -6,38 +6,43 @@ const {
     sleep
 } = require('../utils/tools.js');
 
+let embedTemplate = {
+    embeds: [{
+        color: null,
+        title: null,
+        author: {
+            name: 'Made with <3 by Rock @ StormeIO',
+            icon_url: 'https://i.imgur.com/e5vzoUb.png'
+        },
+        fields: [
+            {
+                name: 'Site',
+                value: 'Supreme',
+            },
+            {
+                name: 'Script URL',
+                value: null,
+            },
+            {
+                name: 'Script SHA256 Checksum',
+                value: null,
+            },
+        ],
+        timestamp: new Date(),
+        footer: {
+            text: 'Made with <3 by Rock @ StormeIO',
+            icon_url: 'https://i.imgur.com/e5vzoUb.png',
+        },
+    }]
+}
+
 module.exports = {
     added: async newScript => {
         try {
-            const embed = {
-                "embeds": [{
-                    color: 1305395,
-                    title: 'New Script Added',
-                    author: {
-                        name: 'Made with <3 by Rock @ StormeIO',
-                        icon_url: 'https://i.imgur.com/e5vzoUb.png'
-                    },
-                    fields: [
-                        {
-                            name: 'Site',
-                            value: 'Supreme',
-                        },
-                        {
-                            name: 'Script URL',
-                            value: newScript.url,
-                        },
-                        {
-                            name: 'Script SHA256 Checksum',
-                            value: newScript.shaChecksum,
-                        },
-                    ],
-                    timestamp: new Date(),
-                    footer: {
-                        text: 'Made with <3 by Rock @ StormeIO',
-                        icon_url: 'https://i.imgur.com/e5vzoUb.png',
-                    },
-                }]
-            }
+            embedTemplate.color = 1305395;
+            embedTemplate.title = 'New Script Added'
+            embedTemplate.embeds[0].fields[1].value = newScript.url;
+            embedTemplate.embeds[0].fields[1].value = newScript.shaChecksum;
     
             await request({
                 url: config.webhook,
@@ -45,92 +50,54 @@ module.exports = {
                 headers: {
                     'content-type': 'application/json',
                 },
-                body: JSON.stringify(embed)
+                body: JSON.stringify(embedTemplate)
             })
         } catch (e) {
-            console.log(`ERR (WH): ${e.message}`);
+            console.error(`ERR (WH): ${e.message}`);
             await sleep(config.delay);
-            return module.exports.added(script);
+            return module.exports.added(newScript);
         }
     },
     removed: async removedScript => {
-        const embed = {
-            "embeds": [{
-                color: 16722217,
-                title: 'Script Removed',
-                author: {
-                    name: 'Made with <3 by Rock @ StormeIO',
-                    icon_url: 'https://i.imgur.com/e5vzoUb.png'
-                },
-                fields: [
-                    {
-                        name: 'Site',
-                        value: 'Supreme',
-                    },
-                    {
-                        name: 'Script URL',
-                        value: removedScript.url,
-                    },
-                    {
-                        name: 'Script SHA256 Checksum',
-                        value: removedScript.shaChecksum,
-                    },
-                ],
-                timestamp: new Date(),
-                footer: {
-                    text: 'Made with <3 by Rock @ StormeIO',
-                    icon_url: 'https://i.imgur.com/e5vzoUb.png',
-                },
-            }]
-        }
+        try {
+            embedTemplate.color = 16722217;
+            embedTemplate.title = 'Script Removed'
+            embedTemplate.embeds[0].fields[1].value = removedScript.url;
+            embedTemplate.embeds[0].fields[1].value = removedScript.shaChecksum;
 
-        await request({
-            url: config.webhook,
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-            },
-            body: JSON.stringify(embed)
-        })
+            await request({
+                url: config.webhook,
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify(embedTemplate)
+            })
+        } catch (e) {
+            console.error(`ERR (WH): ${e.message}`);
+            await sleep(config.delay);
+            return module.exports.removed(removedScript);
+        }
     },
     edited: async editedScript => {
-        const embed = {
-            "embeds": [{
-                color: 16769090,
-                title: 'Script Contents Edited',
-                author: {
-                    name: 'Made with <3 by Rock @ StormeIO',
-                    icon_url: 'https://i.imgur.com/e5vzoUb.png'
+        try {
+            embedTemplate.color = 16769090;
+            embedTemplate.title = 'Script Contents Edited'
+            embedTemplate.embeds[0].fields[1].value = removedScript.url;
+            embedTemplate.embeds[0].fields[1].value = removedScript.shaChecksum;
+            
+            await request({
+                url: config.webhook,
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
                 },
-                fields: [
-                    {
-                        name: 'Site',
-                        value: 'Supreme',
-                    },
-                    {
-                        name: 'Script URL',
-                        value: editedScript.url,
-                    },
-                    {
-                        name: 'Script SHA256 Checksum',
-                        value: editedScript.shaChecksum,
-                    },
-                ],
-                timestamp: new Date(),
-                footer: {
-                    text: 'Made with <3 by Rock @ StormeIO',
-                    icon_url: 'https://i.imgur.com/e5vzoUb.png',
-                },
-            }]
+                body: JSON.stringify(embedTemplate)
+            })
+        } catch (e) {
+            console.error(`ERR (WH): ${e.message}`);
+            await sleep(config.delay);
+            return module.exports.removed(editedScript);
         }
-
-        await request({
-            url: config.webhook,
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-            },
-            body: JSON.stringify(embed)
-        })
     }
 }
