@@ -72,7 +72,7 @@ class Monitor extends events {
             $('script').each(async (i, e) => {
                 if (!e.attribs['src']) return;
 
-                if (e.attribs['src'].contains('google')) return;
+                if (e.attribs['src'].indexOf('google') != -1) return;
     
                 let _shaChecksum = async (_this) => {
                     let shaChecksum = await _this.getChecksum(e.attribs[ 'src' ]);
@@ -125,7 +125,7 @@ class Monitor extends events {
             $('script').each(async (i, e) => {
                 if (!e.attribs['src']) return;
 
-                if (e.attribs['src'].contains('google')) return;
+                if (e.attribs['src'].indexOf('google') != -1) return;
     
                 let _shaChecksum = async (_this) => {
                     let shaChecksum = await _this.getChecksum(e.attribs[ 'src' ]);
