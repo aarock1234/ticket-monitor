@@ -44,14 +44,7 @@ module.exports = {
             embedTemplate.embeds[0].fields[1].value = newScript.url;
             embedTemplate.embeds[0].fields[1].value = newScript.shaChecksum;
     
-            await request({
-                url: config.webhook,
-                method: 'POST',
-                headers: {
-                    'content-type': 'application/json',
-                },
-                body: JSON.stringify(embedTemplate)
-            })
+            module.exports.send();
         } catch (e) {
             console.error(`ERR (WH): ${e.message}`);
             await sleep(config.delay);
@@ -65,14 +58,7 @@ module.exports = {
             embedTemplate.embeds[0].fields[1].value = removedScript.url;
             embedTemplate.embeds[0].fields[1].value = removedScript.shaChecksum;
 
-            await request({
-                url: config.webhook,
-                method: 'POST',
-                headers: {
-                    'content-type': 'application/json',
-                },
-                body: JSON.stringify(embedTemplate)
-            })
+            module.exports.send();
         } catch (e) {
             console.error(`ERR (WH): ${e.message}`);
             await sleep(config.delay);
@@ -86,6 +72,15 @@ module.exports = {
             embedTemplate.embeds[0].fields[1].value = removedScript.url;
             embedTemplate.embeds[0].fields[1].value = removedScript.shaChecksum;
             
+            module.exports.send();
+        } catch (e) {
+            console.error(`ERR (WH): ${e.message}`);
+            await sleep(config.delay);
+            return module.exports.removed(editedScript);
+        }
+    },
+    send: async () => {
+        try {
             await request({
                 url: config.webhook,
                 method: 'POST',
@@ -95,9 +90,9 @@ module.exports = {
                 body: JSON.stringify(embedTemplate)
             })
         } catch (e) {
-            console.error(`ERR (WH): ${e.message}`);
+            console.error(`ERR (WHS): ${e.message}`);
             await sleep(config.delay);
-            return module.exports.removed(editedScript);
+            return module.exports.send();
         }
     }
 }
