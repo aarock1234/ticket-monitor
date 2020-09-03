@@ -1,4 +1,4 @@
 {
-    "delay": 1000,
-    "webhook": "webhookURL"
+    "delay": 1000, 
+    "webhook": ""
 }

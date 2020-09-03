@@ -31,10 +31,12 @@ class Monitor extends events {
     constructor() {
         super();
 
-        this.previousLoop = null;
-        this.currentLoop = null;
+        this.previousLoop = [];
+        this.currentLoop = [];
 
         this.proxies = [];
+
+        this.updateInterval = null;
 
         this.initProxies();
     }
@@ -51,11 +53,9 @@ class Monitor extends events {
         
         if (this.proxies.length == 0) return console.log('ERR: Please add proxies.');
 
-        if (!this.config.delay || !this.config.webhook) return console.log('ERR: Please configure your config.json');
+        if (!config.delay || !config.webhook) return console.log('ERR: Please configure your config.json');
 
-        this.previousLoop = [];
-
-        try {
+        try {            
             let response = await request({
                 url: 'https://www.supremenewyork.com/shop/all',
                 proxy: this.getProxy()
@@ -88,6 +88,13 @@ class Monitor extends events {
 
             Promise.all(promiseList)
                 .then(() => {
+                    console.log('Monitoring...');
+
+                    if (!this.updateInterval)
+                        this.updateInterval = setInterval(() => 
+                                console.log(`Still Here @ ${new Date().toISOString()}`)
+                                , 1800000);
+                                
                     return this.monitorLoop();
                 })
                 
@@ -99,8 +106,6 @@ class Monitor extends events {
     }
 
     monitorLoop = async () => {
-        console.log('Monitoring...');
-        
         try {
             let response = await request({
                 url: 'https://www.supremenewyork.com/shop/all',
@@ -128,28 +133,28 @@ class Monitor extends events {
                         shaChecksum: shaChecksum
                     }
 
+                    await _this.currentLoop.push(currentScript);
+
                     let matchedScript = _this.previousLoop.find(script => script.url == currentScript.url);
 
                     if (!matchedScript)
                         _this.emit('added', currentScript);
                     else if (matchedScript.shaChecksum != currentScript.shaChecksum)
                         _this.emit('edited', currentScript);
-        
-                    await _this.currentLoop.push(currentScript);
-
-                    await _this.previousLoop.forEach(previousScript => {
-                        let removedScript = _this.currentLoop.find(script => script.url == previousScript.url)
-
-                        if (!removedScript)
-                            _this.emit('removed', previousScript);
-                    })
                 }
 
                 promiseList.push(_shaChecksum(this));
             })
 
             Promise.all(promiseList)
-                .then(async () => {
+                .then(async () => {    
+                    await this.previousLoop.forEach(async previousScript => {
+                        let removedScript = this.currentLoop.find(script => script.url == previousScript.url);
+
+                        if (!removedScript)
+                            this.emit('removed', previousScript);
+                    })
+
                     this.previousLoop = this.currentLoop;
                     this.currentLoop = [];
 
