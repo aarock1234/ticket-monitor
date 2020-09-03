@@ -8,37 +8,37 @@ const {
 
 module.exports = {
     send: async (color, title, script) => {
-        const embed = {
-            embeds: [{
-                color: color,
-                title: title,
-                author: {
-                    name: 'Made with <3 by Rock @ StormeIO',
-                    icon_url: 'https://i.imgur.com/e5vzoUb.png'
-                },
-                fields: [
-                    {
-                        name: 'Site',
-                        value: 'Supreme',
-                    },
-                    {
-                        name: 'Script URL',
-                        value: script.url,
-                    },
-                    {
-                        name: 'Script SHA256 Checksum',
-                        value: script.shaChecksum,
-                    },
-                ],
-                timestamp: new Date(),
-                footer: {
-                    text: 'Made with <3 by Rock @ StormeIO',
-                    icon_url: 'https://i.imgur.com/e5vzoUb.png',
-                },
-            }]
-        }
-
         try {
+            const embed = {
+                embeds: [{
+                    color: color,
+                    title: title,
+                    author: {
+                        name: 'Made with <3 by Rock @ StormeIO',
+                        icon_url: 'https://i.imgur.com/e5vzoUb.png'
+                    },
+                    fields: [
+                        {
+                            name: 'Site',
+                            value: 'Supreme',
+                        },
+                        {
+                            name: 'Script URL',
+                            value: script.url,
+                        },
+                        {
+                            name: 'Script SHA256 Checksum',
+                            value: script.shaChecksum,
+                        },
+                    ],
+                    timestamp: new Date(),
+                    footer: {
+                        text: 'Made with <3 by Rock @ StormeIO',
+                        icon_url: 'https://i.imgur.com/e5vzoUb.png',
+                    },
+                }]
+            }
+
             await request({
                 url: config.webhook,
                 method: 'POST',
@@ -50,7 +50,7 @@ module.exports = {
         } catch (e) {
             console.error(`ERR (WHS): ${e.message}`);
             await sleep(config.delay);
-            return module.exports.send();
+            return module.exports.send(color, title, script);
         }
     }
 }
